@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meudeployment
+spec:
+  replicas: 20
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: web
+        image: kubedevio/web-color:green
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+
+# /////////////////////////
+# // Services ClusterIP //
+# ///////////////////////
+# O ClusterIP é utilizado para que os pods consigam se comunicar dentro de um cluster Kubernetes.
+# eliminando a necessidade de apontar para o ip do pod, o que deixariam as requisições estaticas para um
+# só pod. Dessa forma é criado um loadbalancer entre as aplicaões e a comunicaão passa a ser feita por nome.
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: webcolor
+# spec:
+#   selector:
+#     app: web
+#   ports:
+#   - port: 80
+#     targetPort: 80
+#     name: http
+#     protocol: TCP
+#   type: ClusterIP
+
+# ///////////////////////
+# // Service NodePort //
+# /////////////////////
+# O Nodeport expõe uma porta no node para acesso ao serviço configurado. A desvantagem disso
+# é que para ter acesso ao serviço é necessário saber o ip do node. Só é possivel expor portas dentro do
+# range de portas entre 30000 e 32767.
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: webcolor
+# spec:
+#   selector:
+#     app: web
+#   ports:
+#   - port: 80
+#     targetPort: 80
+#     name: http
+#     protocol: TCP
+#     nodePort: 30000
+#   type: NodePort
+
+# ///////////////////////////
+# // Service LoadBalancer //
+# /////////////////////////
+# O LoadBalancer é utilizado para expor a aplicação para a internet. No momento que configuramos no provider
+# nos é disponibilizado um ip publico por onde a aplicação será acessivel. Tambem é feito um balanceamento
+# por baixo dos panos para os serviços.
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: webcolor
+# spec:
+#   selector:
+#     app: web
+#   type: LoadBalancer
